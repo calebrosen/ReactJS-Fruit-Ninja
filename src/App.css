@@ -4,18 +4,21 @@
   background-color: lightblue;
 }
 
+html,
 body {
-  overflow: hidden !important;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  contain: paint;
 }
 
-.fruit {
-  position: absolute;
-  cursor: pointer;
+body {
+  position: relative;
 }
 
 .fruitContainer {
   position: relative;
   width: 100vw;
   height: 100vh;
-  overflow: hidden; /* Hide scrollbars */
+  overflow: hidden;
+  contain: paint;
 }

@@ -1,53 +1,55 @@
 import { motion } from 'framer-motion';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Fruit = ({ fruit, onClick }) => {
-    // Initial Y
-    const [fruitY, setFruitY] = useState(800); 
-     // Initial X
-    const [maxHeight, setMaxHeight] = useState(-300);
-     // Random horizontal position
-    const [fruitX, setFruitX] = useState(Math.floor(Math.random() * window.innerWidth));
+    const [fruitY, setFruitY] = useState(0); // Start at the bottom
+    const [fruitX, setFruitX] = useState(Math.floor(Math.random() * (window.innerWidth - 50)));
+    const [hasAnimated, setHasAnimated] = useState(false); // State to control if it has animated
 
     useEffect(() => {
-        // Function to reset the fruit's properties
-        const resetFruit = () => {
-            setFruitY(800); // Resetting to the botom of the screen
-            setMaxHeight(Math.floor(Math.random() * -800) - 200);
-            setFruitX(Math.floor(Math.random() * window.innerWidth)); // Random horizontal position
-        };
-
-        // Calling periodically
-        const interval = setInterval(() => {
-            resetFruit();
-        }, 5000);
-
-        return () => clearInterval(interval);
+        resetFruit(); // Reset position on mount
     }, []);
 
+    const resetFruit = () => {
+        setFruitY(0); // Reset to the bottom
+        setFruitX(Math.floor(Math.random() * (window.innerWidth - 50))); // Random X position
+        setHasAnimated(false); // Allow animation
+    };
+
+    const handleAnimationComplete = () => {
+        if (hasAnimated) {
+            resetFruit(); // Reset position after falling down
+        }
+    };
+
     return (
-        //individual fruit
         <motion.div
-        className="fruit"
-        style={{
-            position: 'absolute',
-            transform: `translateX(${fruitX}px)`,
-            bottom: '0',
-            fontSize: '50px',
-            cursor: 'pointer',
-        }}
-        onClick={onClick}
-        initial={{ y: fruitY }}
-        animate={{ y: [fruitY, maxHeight, fruitY] }}
-        transition={{
-            duration: 4,
-            ease: "easeInOut",
-            repeat: Infinity,
-            repeatType: "loop",
-        }}
-    >
-        {fruit.symbol}
-    </motion.div>
+            className="fruit"
+            style={{
+                position: 'absolute',
+                transform: `translateX(${fruitX}px)`,
+                bottom: '0',
+                overflow: 'hidden',
+                fontSize: '50px',
+                cursor: 'pointer',
+            }}
+            onClick={onClick}
+            initial={{ y: fruitY, x: fruitX }}
+            animate={{ y: hasAnimated ? 0 : Math.floor(Math.random() * -800) }} // Go up once
+            transition={{
+                duration: 2,
+                ease: "easeInOut",
+                onComplete: () => {
+                    if (!hasAnimated) {
+                        setHasAnimated(true); // Mark as animated
+                    } else {
+                        handleAnimationComplete(); // Handle reset
+                    }
+                },
+            }}
+        >
+            {fruit.symbol}
+        </motion.div>
     );
 };
 
